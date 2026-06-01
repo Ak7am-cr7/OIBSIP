@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NovaSafe — Stay Private. Stay Free.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #060910;
+      --bg2: #0c1220;
+      --accent: #00e5a0;
+      --accent2: #0099ff;
+      --text: #e8edf5;
+      --muted: #7a8ba0;
+      --card: rgba(255,255,255,0.03);
+      --border: rgba(255,255,255,0.07);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.4;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 60px;
+      background: rgba(6,9,16,0.7);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.4rem;
+      letter-spacing: -0.5px;
+    }
+    .logo span { color: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-cta {
+      background: var(--accent);
+      color: #060910;
+      border: none;
+      padding: 10px 24px;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .nav-cta:hover {
+      background: #00ffb3;
+      transform: translateY(-1px);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 20px 80px;
+      overflow: hidden;
+    }
+
+    /* Glow blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .blob-1 {
+      width: 600px; height: 600px;
+      background: var(--accent);
+      top: -100px; left: -150px;
+      animation: float1 8s ease-in-out infinite;
+    }
+    .blob-2 {
+      width: 500px; height: 500px;
+      background: var(--accent2);
+      bottom: -100px; right: -100px;
+      animation: float2 10s ease-in-out infinite;
+    }
+    .blob-3 {
+      width: 300px; height: 300px;
+      background: #9b59b6;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation: float1 12s ease-in-out infinite reverse;
+    }
+
+    @keyframes float1 {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-30px) scale(1.05); }
+    }
+    @keyframes float2 {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(20px) scale(0.95); }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0,229,160,0.1);
+      border: 1px solid rgba(0,229,160,0.25);
+      color: var(--accent);
+      padding: 6px 16px;
+      border-radius: 100px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      margin-bottom: 30px;
+      animation: fadeUp 0.8s ease both;
+    }
+    .badge-dot {
+      width: 6px; height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.5); }
+    }
+
+    .hero h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.8rem, 7vw, 6rem);
+      font-weight: 800;
+      line-height: 1.05;
+      letter-spacing: -2px;
+      margin-bottom: 24px;
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      max-width: 560px;
+      font-size: 1.1rem;
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 40px;
+      font-weight: 300;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #060910;
+      border: none;
+      padding: 16px 36px;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.25s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary:hover {
+      background: #00ffb3;
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px rgba(0,229,160,0.3);
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 16px 36px;
+      border-radius: 100px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .btn-secondary:hover {
+      border-color: rgba(255,255,255,0.2);
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-3px);
+    }
+
+    /* Hero Visual */
+    .hero-visual {
+      margin-top: 70px;
+      position: relative;
+      width: 100%;
+      max-width: 750px;
+      animation: fadeUp 0.8s 0.4s ease both;
+    }
+
+    .shield-container {
+      position: relative;
+      display: inline-block;
+    }
+
+    .shield-svg {
+      width: 180px;
+      height: 180px;
+      filter: drop-shadow(0 0 40px rgba(0,229,160,0.4));
+      animation: shieldPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes shieldPulse {
+      0%, 100% { filter: drop-shadow(0 0 40px rgba(0,229,160,0.4)); }
+      50% { filter: drop-shadow(0 0 70px rgba(0,229,160,0.7)); }
+    }
+
+    .orbit {
+      position: absolute;
+      top: 50%; left: 50%;
+      border: 1px dashed rgba(0,229,160,0.2);
+      border-radius: 50%;
+      animation: spin linear infinite;
+    }
+    .orbit-1 {
+      width: 280px; height: 280px;
+      margin: -140px 0 0 -140px;
+      animation-duration: 12s;
+    }
+    .orbit-2 {
+      width: 380px; height: 380px;
+      margin: -190px 0 0 -190px;
+      animation-duration: 18s;
+      animation-direction: reverse;
+      border-color: rgba(0,153,255,0.15);
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .orbit-dot {
+      position: absolute;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      top: -5px; left: 50%;
+      margin-left: -5px;
+    }
+    .orbit-1 .orbit-dot { background: var(--accent); box-shadow: 0 0 12px var(--accent); }
+    .orbit-2 .orbit-dot { background: var(--accent2); box-shadow: 0 0 12px var(--accent2); }
+
+    /* ── TRUST STRIP ── */
+    .trust-strip {
+      display: flex;
+      justify-content: center;
+      gap: 50px;
+      flex-wrap: wrap;
+      padding: 40px 60px;
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .trust-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .trust-item svg { color: var(--accent); }
+
+    /* ── SECTIONS ── */
+    section {
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-label {
+      display: inline-block;
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      padding: 100px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .features-header {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: end;
+      margin-bottom: 70px;
+    }
+
+    .features-header h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      line-height: 1.15;
+      letter-spacing: -1px;
+    }
+
+    .features-header p {
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .feature-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 30px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .feature-card:hover {
+      border-color: rgba(0,229,160,0.2);
+      transform: translateY(-5px);
+      background: rgba(0,229,160,0.03);
+    }
+    .feature-card:hover::before { opacity: 1; }
+
+    .feature-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      background: rgba(0,229,160,0.1);
+      border: 1px solid rgba(0,229,160,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+      font-size: 1.4rem;
+    }
+    .feature-card:nth-child(2) .feature-icon {
+      background: rgba(0,153,255,0.1);
+      border-color: rgba(0,153,255,0.2);
+    }
+    .feature-card:nth-child(3) .feature-icon {
+      background: rgba(155,89,182,0.1);
+      border-color: rgba(155,89,182,0.2);
+    }
+
+    .feature-card h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .feature-card p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how-it-works {
+      padding: 100px 60px;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .how-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .how-header {
+      text-align: center;
+      margin-bottom: 70px;
+    }
+    .how-header h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -1px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 40px;
+      position: relative;
+    }
+
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 40px;
+      left: calc(16.66% + 20px);
+      right: calc(16.66% + 20px);
+      height: 1px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      opacity: 0.3;
+    }
+
+    .step {
+      text-align: center;
+      padding: 30px 20px;
+    }
+
+    .step-num {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--accent);
+      margin: 0 auto 24px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+    .step p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      font-weight: 300;
+    }
+
+    /* ── STATS ── */
+    .stats {
+      padding: 100px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      align-items: center;
+    }
+
+    .stats-left h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 20px;
+      line-height: 1.15;
+    }
+    .stats-left p {
+      color: var(--muted);
+      line-height: 1.7;
+      font-weight: 300;
+      margin-bottom: 30px;
+    }
+
+    .stats-numbers {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .stat-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .stat-box .num {
+      font-family: 'Syne', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .stat-box .label {
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* World Map Visual */
+    .world-visual {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .world-visual::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 50%, rgba(0,229,160,0.05), transparent 70%);
+    }
+
+    .world-dots {
+      display: grid;
+      grid-template-columns: repeat(20, 1fr);
+      gap: 6px;
+      opacity: 0.4;
+    }
+
+    .world-dot {
+      width: 4px; height: 4px;
+      border-radius: 50%;
+      background: var(--muted);
+    }
+
+    .world-dot.active {
+      background: var(--accent);
+      opacity: 1;
+      box-shadow: 0 0 6px var(--accent);
+      animation: dotPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes dotPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    .server-count {
+      margin-top: 24px;
+      font-family: 'Syne', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--accent);
+    }
+    .server-label {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* ── PRICING ── */
+    .pricing {
+      padding: 100px 60px;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+    }
+
+    .pricing-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .pricing-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .pricing-header h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    .pricing-header p {
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .price-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px 28px;
+      transition: all 0.3s;
+    }
+
+    .price-card.popular {
+      background: linear-gradient(135deg, rgba(0,229,160,0.08), rgba(0,153,255,0.05));
+      border-color: rgba(0,229,160,0.3);
+      position: relative;
+    }
+
+    .popular-badge {
+      position: absolute;
+      top: -14px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #060910;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 16px;
+      border-radius: 100px;
+      white-space: nowrap;
+    }
+
+    .plan-name {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 16px;
+    }
+
+    .plan-price {
+      font-family: 'Syne', sans-serif;
+      font-size: 3rem;
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .price-card.popular .plan-price {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .plan-period {
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-bottom: 30px;
+    }
+
+    .plan-features {
+      list-style: none;
+      margin-bottom: 30px;
+    }
+    .plan-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .plan-features li:last-child { border: none; }
+    .check { color: var(--accent); font-size: 1rem; }
+
+    .plan-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 100px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .price-card.popular .plan-btn {
+      background: var(--accent);
+      color: #060910;
+      border-color: var(--accent);
+    }
+    .plan-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,229,160,0.2);
+    }
+
+    /* ── TESTIMONIALS ── */
+    .testimonials {
+      padding: 100px 60px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .testimonials-header {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+    .testimonials-header h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 700;
+      letter-spacing: -1px;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .testimonial-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 30px;
+      transition: all 0.3s;
+    }
+    .testimonial-card:hover {
+      border-color: rgba(0,229,160,0.2);
+      transform: translateY(-4px);
+    }
+
+    .stars {
+      color: var(--accent);
+      font-size: 1rem;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+
+    .testimonial-text {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      font-weight: 300;
+      margin-bottom: 24px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .author-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+
+    .author-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .author-title {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 100px 60px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 400px;
+      background: radial-gradient(ellipse, rgba(0,229,160,0.08), transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-box {
+      max-width: 700px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    .cta-box h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      font-weight: 800;
+      letter-spacing: -2px;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .cta-box p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      font-weight: 300;
+      margin-bottom: 40px;
+      line-height: 1.7;
+    }
+
+    .cta-guarantee {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 0.85rem;
+      margin-top: 20px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 60px 60px 40px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 60px;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .footer-brand p {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.7;
+      font-weight: 300;
+      margin-top: 16px;
+    }
+
+    .footer-col h4 {
+      font-family: 'Syne', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--muted);
+      margin-bottom: 20px;
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .footer-col ul a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .footer-col ul a:hover { color: var(--text); }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 30px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .features { padding: 70px 24px; }
+      .features-header { grid-template-columns: 1fr; gap: 20px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .how-it-works { padding: 70px 24px; }
+      .steps { grid-template-columns: 1fr; }
+      .steps::before { display: none; }
+      .stats { padding: 70px 24px; }
+      .stats-grid { grid-template-columns: 1fr; }
+      .pricing { padding: 70px 24px; }
+      .pricing-grid { grid-template-columns: 1fr; }
+      .testimonials { padding: 70px 24px; }
+      .testimonials-grid { grid-template-columns: 1fr; }
+      .cta-section { padding: 70px 24px; }
+      footer { padding: 60px 24px 30px; }
+      .footer-grid { grid-template-columns: 1fr 1fr; gap: 40px; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+      .trust-strip { padding: 30px 24px; gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <div class="logo">Nova<span>Safe</span></div>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How it Works</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#reviews">Reviews</a></li>
+    </ul>
+    <button class="nav-cta">Get Started Free</button>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="hero-badge">
+      <div class="badge-dot"></div>
+      Trusted by 2M+ users worldwide
+    </div>
+
+    <h1>Browse the web<br><em>without limits</em></h1>
+
+    <p>NovaSafe encrypts your connection, hides your identity, and unlocks the full internet — in one click. Fast, private, effortless.</p>
+
+    <div class="hero-buttons">
+      <button class="btn-primary">
+        🛡️ Start Free Trial
+      </button>
+      <button class="btn-secondary">See How it Works →</button>
+    </div>
+
+    <!-- Shield Visual -->
+    <div class="hero-visual">
+      <div class="shield-container">
+        <div class="orbit orbit-1"><div class="orbit-dot"></div></div>
+        <div class="orbit orbit-2"><div class="orbit-dot"></div></div>
+        <svg class="shield-svg" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M50 5L15 20V50C15 68 30 83 50 95C70 83 85 68 85 50V20L50 5Z" fill="rgba(0,229,160,0.1)" stroke="#00e5a0" stroke-width="2"/>
+          <path d="M50 20L30 30V50C30 62 38 72 50 80C62 72 70 62 70 50V30L50 20Z" fill="rgba(0,229,160,0.15)" stroke="#00e5a0" stroke-width="1.5"/>
+          <path d="M38 50L46 58L62 42" stroke="#00e5a0" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST STRIP -->
+  <div class="trust-strip">
+    <div class="trust-item">
+      <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      Military-grade Encryption
+    </div>
+    <div class="trust-item">
+      <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3.707 2.293a1 1 0 00-1.414 1.414l14 14a1 1 0 001.414-1.414l-1.473-1.473A10.014 10.014 0 0019.542 10C18.268 5.943 14.478 3 10 3a9.958 9.958 0 00-4.512 1.074l-1.78-1.781zm4.261 4.26l1.514 1.515a2.003 2.003 0 012.45 2.45l1.514 1.514a4 4 0 00-5.478-5.478z" clip-rule="evenodd"/><path d="M12.454 16.697L9.75 13.992a4 4 0 01-3.742-3.741L2.335 6.578A9.98 9.98 0 00.458 10c1.274 4.057 5.065 7 9.542 7 .847 0 1.669-.105 2.454-.303z"/></svg>
+      No-Logs Policy
+    </div>
+    <div class="trust-item">
+      <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clip-rule="evenodd"/></svg>
+      Lightning Fast Servers
+    </div>
+    <div class="trust-item">
+      <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/></svg>
+      30-Day Money Back
+    </div>
+    <div class="trust-item">
+      <svg width="18" height="18" fill="currentColor" viewBox="0 0 20 20"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v3h8v-3zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-3a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v3h-3zM4.75 12.094A5.973 5.973 0 004 15v3H1v-3a3 3 0 013.75-2.906z"/></svg>
+      24/7 Live Support
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="features" id="features">
+    <div class="features-header fade-up">
+      <div>
+        <span class="section-label">Why NovaSafe</span>
+        <h2>Everything you need to stay protected</h2>
+      </div>
+      <p>From encryption to anonymity, NovaSafe covers all bases so you can focus on what matters — a free and open internet.</p>
+    </div>
+
+    <div class="features-grid">
+      <div class="feature-card fade-up">
+        <div class="feature-icon">🔐</div>
+        <h3>AES-256 Encryption</h3>
+        <p>Your data is locked with the same encryption used by governments and banks. Completely unbreakable.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">🌐</div>
+        <h3>Global Server Network</h3>
+        <p>Access content from 160+ locations across 94 countries with ultra-low latency and zero buffering.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">👻</div>
+        <h3>Full Anonymity</h3>
+        <p>Your real IP is hidden, your DNS is secure, and we never log your activity. You're invisible online.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">⚡</div>
+        <h3>Blazing Fast Speeds</h3>
+        <p>Proprietary Lightway protocol delivers speeds so fast you won't even notice you're using a VPN.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">📱</div>
+        <h3>All Your Devices</h3>
+        <p>One subscription covers up to 8 devices — phones, laptops, routers, smart TVs and more.</p>
+      </div>
+      <div class="feature-card fade-up">
+        <div class="feature-icon">🛡️</div>
+        <h3>Kill Switch</h3>
+        <p>If the VPN drops, your internet cuts instantly — ensuring your real IP is never accidentally exposed.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-it-works" id="how">
+    <div class="how-inner">
+      <div class="how-header fade-up">
+        <span class="section-label">Simple Setup</span>
+        <h2>Get protected in 3 steps</h2>
+      </div>
+
+      <div class="steps">
+        <div class="step fade-up">
+          <div class="step-num">01</div>
+          <h3>Create Your Account</h3>
+          <p>Sign up in under 60 seconds. No personal details required — just an email and you're in.</p>
+        </div>
+        <div class="step fade-up">
+          <div class="step-num">02</div>
+          <h3>Install the App</h3>
+          <p>Download NovaSafe on any device — Windows, Mac, iOS, Android, or Linux. Takes under a minute.</p>
+        </div>
+        <div class="step fade-up">
+          <div class="step-num">03</div>
+          <h3>Connect &amp; Browse</h3>
+          <p>Hit the big power button. Choose a server. Done. You're now fully encrypted and anonymous.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="stats-grid">
+      <div class="stats-left fade-up">
+        <span class="section-label">Global Reach</span>
+        <h2>Ultra-fast servers around the globe</h2>
+        <p>Our network is built for speed and reliability, with thousands of servers strategically placed for the lowest possible latency.</p>
+        <div class="stats-numbers">
+          <div class="stat-box">
+            <div class="num">160+</div>
+            <div class="label">Locations</div>
+          </div>
+          <div class="stat-box">
+            <div class="num">94</div>
+            <div class="label">Countries</div>
+          </div>
+          <div class="stat-box">
+            <div class="num">∞</div>
+            <div class="label">Bandwidth</div>
+          </div>
+          <div class="stat-box">
+            <div class="num">2M+</div>
+            <div class="label">Users</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="world-visual fade-up">
+        <div class="world-dots" id="worldDots"></div>
+        <div class="server-count">3,000+</div>
+        <div class="server-label">Global Servers</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing" id="pricing">
+    <div class="pricing-inner">
+      <div class="pricing-header fade-up">
+        <span class="section-label">Simple Pricing</span>
+        <h2>No hidden fees. Ever.</h2>
+        <p>Start free. Upgrade when you're ready.</p>
+      </div>
+
+      <div class="pricing-grid">
+        <div class="price-card fade-up">
+          <div class="plan-name">Starter</div>
+          <div class="plan-price">$0</div>
+          <div class="plan-period">Free forever</div>
+          <ul class="plan-features">
+            <li><span class="check">✓</span> 3 server locations</li>
+            <li><span class="check">✓</span> 2 GB/month</li>
+            <li><span class="check">✓</span> Basic encryption</li>
+            <li><span class="check">✓</span> 1 device</li>
+          </ul>
+          <button class="plan-btn">Get Started Free</button>
+        </div>
+
+        <div class="price-card popular fade-up">
+          <div class="popular-badge">⭐ Most Popular</div>
+          <div class="plan-name">Pro</div>
+          <div class="plan-price">$4.99</div>
+          <div class="plan-period">per month, billed annually</div>
+          <ul class="plan-features">
+            <li><span class="check">✓</span> 160+ locations</li>
+            <li><span class="check">✓</span> Unlimited bandwidth</li>
+            <li><span class="check">✓</span> AES-256 encryption</li>
+            <li><span class="check">✓</span> 8 devices</li>
+            <li><span class="check">✓</span> Kill switch</li>
+          </ul>
+          <button class="plan-btn">Start 30-Day Trial</button>
+        </div>
+
+        <div class="price-card fade-up">
+          <div class="plan-name">Teams</div>
+          <div class="plan-price">$9.99</div>
+          <div class="plan-period">per user/month</div>
+          <ul class="plan-features">
+            <li><span class="check">✓</span> Everything in Pro</li>
+            <li><span class="check">✓</span> Unlimited devices</li>
+            <li><span class="check">✓</span> Dedicated IP</li>
+            <li><span class="check">✓</span> Priority support</li>
+            <li><span class="check">✓</span> Admin dashboard</li>
+          </ul>
+          <button class="plan-btn">Contact Sales</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="testimonials" id="reviews">
+    <div class="testimonials-header fade-up">
+      <span class="section-label">Real Reviews</span>
+      <h2>Loved by privacy enthusiasts</h2>
+    </div>
+
+    <div class="testimonials-grid">
+      <div class="testimonial-card fade-up">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"NovaSafe is the only VPN I've tried that doesn't slow down my connection. Setup took 2 minutes and I've been protected for 8 months now."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:rgba(0,229,160,0.15); color:var(--accent)">AK</div>
+          <div>
+            <div class="author-name">Arjun K.</div>
+            <div class="author-title">Software Engineer, Bangalore</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card fade-up">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"I travel constantly for work. NovaSafe keeps my data secure on hotel WiFi and lets me access my home country's streaming services. Absolute must-have."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:rgba(0,153,255,0.15); color:var(--accent2)">SM</div>
+          <div>
+            <div class="author-name">Sara M.</div>
+            <div class="author-title">Product Manager, Dubai</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="testimonial-card fade-up">
+        <div class="stars">★★★★★</div>
+        <p class="testimonial-text">"Switched from a big-name VPN and the difference is night and day. Faster, cheaper, and the kill switch actually works. Won't go back."</p>
+        <div class="testimonial-author">
+          <div class="author-avatar" style="background:rgba(155,89,182,0.15); color:#9b59b6">JL</div>
+          <div>
+            <div class="author-name">Jake L.</div>
+            <div class="author-title">Freelance Designer, London</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-box fade-up">
+      <h2>Your privacy starts <em style="color:var(--accent)">today</em></h2>
+      <p>Join 2 million people who trust NovaSafe to protect their online life. No credit card required to start.</p>
+      <button class="btn-primary" style="margin: 0 auto; display:inline-flex">
+        🛡️ Get NovaSafe Free
+      </button>
+      <div class="cta-guarantee">
+        <span>✓</span> 30-day money-back guarantee &nbsp;·&nbsp;
+        <span>✓</span> No credit card needed &nbsp;·&nbsp;
+        <span>✓</span> Cancel anytime
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo">Nova<span>Safe</span></div>
+        <p>Protecting your digital freedom since 2020. Fast, private, and trusted by millions worldwide.</p>
+      </div>
+
+      <div class="footer-col">
+        <h4>Product</h4>
+        <ul>
+          <li><a href="#">Features</a></li>
+          <li><a href="#">Pricing</a></li>
+          <li><a href="#">Download</a></li>
+          <li><a href="#">Changelog</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Company</h4>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Blog</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Press</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Legal</h4>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+          <li><a href="#">No-Logs Audit</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <span>© 2024 NovaSafe. All rights reserved.</span>
+      <span>Made with 🛡️ for a freer internet</span>
+    </div>
+  </footer>
+
+  <script>
+    // Generate world dots
+    const dotsContainer = document.getElementById('worldDots');
+    const activePositions = [
+      12, 15, 32, 45, 67, 89, 102, 134, 156, 178,
+      23, 56, 78, 90, 112, 145, 167, 189, 201, 234
+    ];
+    for (let i = 0; i < 200; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'world-dot' + 
+        (activePositions.includes(i) ? ' active' : '');
+      if (dot.classList.contains('active')) {
+        dot.style.animationDelay = Math.random() * 2 + 's';
+      }
+      dotsContainer.appendChild(dot);
+    }
+
+    // Scroll animations
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, 100);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.fade-up').forEach(el => {
+      observer.observe(el);
+    });
+  </script>
+</body>
+</html>
