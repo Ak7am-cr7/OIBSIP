@@ -32,5 +32,5 @@ during my Web Development Internship at
 ---
 
 ## 🔗 Connect With Me
-- [LinkedIn](https://www.linkedin.com/in/YOUR-LINKEDIN)
+- [LinkedIn](https://www.linkedin.com/in/mohammed-ak7am-r-/)
 - [GitHub](https://github.com/ak7am-cr7)
