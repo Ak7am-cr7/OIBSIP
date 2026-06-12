@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mohammed Akram R | Cloud & Application Support Engineer</title>
+    <!-- Google Fonts & FontAwesome -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@1,400;1,500;1,600&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-deep: #0b0e14;
+            --bg-surface: rgba(22, 27, 34, 0.4);
+            --bg-card: rgba(22, 27, 34, 0.6);
+            --aws-orange: #ff9900;
+            --aws-squid: #232f3e;
+            --cloud-blue: #0073bb;
+            --text-main: #e6edf3;
+            --text-muted: #8b949e;
+            --border-glow: rgba(255, 153, 0, 0.15);
+            --border-subtle: rgba(139, 148, 158, 0.12);
+            --font-sans: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-sans);
+        }
+
+        /* ── ONLY THESE BODY LINES CHANGED (canvas replaces old gradient) ── */
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fixed canvas sits behind everything */
+        #bg-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Soft ambient overlay on top of canvas */
+        #bg-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            background:
+                radial-gradient(ellipse at 15% 20%, rgba(0,115,187,0.07) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 80%, rgba(255,153,0,0.05) 0%, transparent 55%),
+                radial-gradient(ellipse at 50% 50%, rgba(11,14,20,0.25) 0%, transparent 100%);
+        }
+
+        /* All content must sit above canvas */
+        nav, section, footer, #loader {
+            position: relative;
+            z-index: 10;
+        }
+        /* ── END BACKGROUND CHANGES ── */
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-deep); }
+        ::-webkit-scrollbar-thumb { background: var(--aws-squid); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--aws-orange); }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        section {
+            padding: 120px 0;
+            position: relative;
+            background: transparent !important;
+            overflow: visible;
+        }
+
+        .section-header {
+            margin-bottom: 3.5rem;
+            position: relative;
+        }
+
+        .section-tag {
+            font-family: var(--font-mono);
+            color: var(--aws-orange);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+        }
+
+        .highlight { color: var(--aws-orange); }
+
+        /* Glassmorphism Card Style */
+        .glass-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: var(--aws-orange);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3), 0 0 15px var(--border-glow);
+            transform: translateY(-4px);
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.6rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary { background-color: #e8702a; color: #fff; }
+        .btn-primary:hover {
+            background-color: #d2611f;
+            transform: scale(1.03);
+            box-shadow: 0 10px 15px rgba(232, 112, 42, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-subtle);
+        }
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--text-main);
+            transform: translateY(-2px);
+        }
+
+        /* Preloader */
+        #loader {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--bg-deep);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1.5rem;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        .loader-cloud {
+            font-size: 3.5rem;
+            color: var(--aws-orange);
+            animation: pulseCloud 2s infinite ease-in-out;
+        }
+
+        .loader-bar {
+            width: 150px;
+            height: 3px;
+            background: var(--aws-squid);
+            border-radius: 2px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loader-progress {
+            width: 40%;
+            height: 100%;
+            background: var(--aws-orange);
+            position: absolute;
+            animation: slideProgress 1.5s infinite ease-in-out;
+        }
+
+        @keyframes pulseCloud {
+            0%, 100% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 15px rgba(255, 153, 0, 0.5)); }
+        }
+
+        @keyframes slideProgress {
+            0% { left: -40%; }
+            100% { left: 100%; }
+        }
+
+        /* Fixed Navigation Overlay */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.5rem 2.5rem;
+            background: transparent;
+        }
+
+        .logo-box {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .center-pill {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50px;
+            padding: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .center-pill .nav-item {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .center-pill .nav-item:hover,
+        .center-pill .nav-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .center-pill .nav-item.active-root {
+            background: #fff;
+            color: #111827;
+        }
+
+        .mobile-hamburger {
+            display: none;
+            color: #fff;
+            background: transparent;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* MODERN HERO CONTAINER PROPERTIES */
+        .hero-section {
+            width: 100%;
+            height: 100vh;
+            min-height: 100vh;
+            position: relative;
+            background: transparent !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-heading-wrapper {
+            position: absolute;
+            top: 35%;
+            left: 0; right: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 0 1.25rem;
+            z-index: 50;
+            text-align: center;
+        }
+
+        .hero-line-1 {
+            display: block;
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 4rem;
+            color: #ffffff;
+        }
+
+        .hero-line-2 {
+            display: block;
+            font-weight: 700;
+            font-size: 2.2rem;
+            margin-top: 0.75rem;
+            letter-spacing: 2px;
+            color: var(--aws-orange);
+            text-transform: uppercase;
+        }
+
+        .hero-bottom-left {
+            position: absolute;
+            bottom: 5rem;
+            left: 2.5rem;
+            max-width: 350px;
+            z-index: 50;
+        }
+
+        .hero-bottom-left p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .hero-bottom-right {
+            position: absolute;
+            bottom: 5rem;
+            right: 2.5rem;
+            max-width: 350px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.25rem;
+            z-index: 50;
+        }
+
+        .hero-bottom-right p {
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* About Section */
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+
+        .about-text p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+        }
+
+        .metric-card {
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .metric-num {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--aws-orange);
+            font-family: var(--font-mono);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        /* Skills Matrix */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .skill-group { padding: 2rem; }
+
+        .skill-group h3 {
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--text-main);
+            border-bottom: 1px solid var(--border-subtle);
+            padding-bottom: 0.75rem;
+        }
+
+        .skill-group h3 i { color: var(--aws-orange); }
+
+        .skill-tags { display: flex; flex-wrap: wrap; gap: 0.6rem; }
+
+        .skill-tag {
+            background: rgba(35, 47, 62, 0.3);
+            border: 1px solid var(--border-subtle);
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+
+        .skill-tag:hover {
+            background: var(--aws-squid);
+            border-color: var(--aws-orange);
+            color: var(--aws-orange);
+        }
+
+        /* Timeline Experience */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 32px; top: 0;
+            width: 2px; height: 100%;
+            background: var(--border-subtle);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 80px;
+            margin-bottom: 3rem;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 21px; top: 4px;
+            width: 24px; height: 24px;
+            background: var(--bg-deep);
+            border: 2px solid var(--aws-orange);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .timeline-dot i { font-size: 0.7rem; color: var(--aws-orange); }
+
+        .timeline-content { padding: 2rem; }
+
+        .timeline-role {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-company {
+            color: var(--aws-orange);
+            font-weight: 500;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+
+        .timeline-meta {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .timeline-body { list-style-type: none; }
+
+        .timeline-body li {
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            line-height: 1.6;
+            position: relative;
+            padding-left: 1.25rem;
+        }
+
+        .timeline-body li::before {
+            content: "▹";
+            position: absolute;
+            left: 0;
+            color: var(--aws-orange);
+        }
+
+        /* Projects Layout */
+        .projects-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        .project-card {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 3rem;
+            padding: 2.5rem;
+            align-items: center;
+        }
+
+        .project-details h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .project-desc {
+            color: var(--text-muted);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .project-tech-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .project-tech-list span {
+            background: rgba(0, 115, 187, 0.1);
+            border: 1px solid rgba(0, 115, 187, 0.2);
+            color: #58a6ff;
+            padding: 0.3rem 0.7rem;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        .project-actions { display: flex; gap: 1rem; }
+
+        .project-visual {
+            background: rgba(15, 19, 25, 0.3);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 1.5rem;
+            height: 100%;
+            min-height: 280px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 1rem;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+        }
+
+        .topology-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            position: relative;
+        }
+
+        .topo-box {
+            background: #161b22;
+            border: 1px solid var(--border-subtle);
+            padding: 0.6rem 1rem;
+            border-radius: 4px;
+            text-align: center;
+            min-width: 100px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .topo-box.active {
+            border-color: var(--aws-orange);
+            box-shadow: 0 0 10px rgba(255, 153, 0, 0.2);
+        }
+
+        .topo-box.secure { border-color: var(--cloud-blue); }
+
+        .topo-arrow-v {
+            width: 2px; height: 25px;
+            background: var(--border-subtle);
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .topo-arrow-v::after {
+            content: '▼';
+            position: absolute;
+            bottom: -6px; left: -4px;
+            font-size: 8px;
+            color: var(--text-muted);
+        }
+
+        /* Contact Structure */
+        .contact-grid {
+            display: grid;
+            grid-template-columns: 0.9fr 1.1fr;
+            gap: 4rem;
+        }
+
+        .contact-info p {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2.5rem;
+        }
+
+        .contact-methods { display: flex; flex-direction: column; gap: 1.5rem; }
+
+        .contact-method { display: flex; align-items: center; gap: 1.25rem; }
+
+        .contact-icon {
+            width: 48px; height: 48px;
+            border-radius: 8px;
+            background: rgba(22, 27, 34, 0.4);
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--aws-orange);
+            font-size: 1.2rem;
+        }
+
+        .contact-lbl { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.15rem; }
+
+        .contact-val {
+            font-size: 1.05rem;
+            font-weight: 500;
+            color: var(--text-main);
+            text-decoration: none;
+        }
+
+        .contact-val:hover { color: var(--aws-orange); }
+
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            padding: 2.5rem;
+        }
+
+        .form-group { display: flex; flex-direction: column; gap: 0.5rem; }
+
+        .form-group label {
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .form-control {
+            background: var(--bg-deep);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 0.8rem 1rem;
+            color: var(--text-main);
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-control:focus { outline: none; border-color: var(--aws-orange); }
+
+        /* Footer System */
+        .footer {
+            border-top: 1px solid var(--border-subtle);
+            padding: 2.5rem 0;
+            background: rgba(11, 14, 20, 0.8);
+            text-align: center;
+        }
+
+        .footer p { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* Scroll Reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        /* Responsive */
+        @media (max-width: 767px) {
+            .center-pill { display: none; }
+            .mobile-hamburger { display: block; }
+            .about-grid, .project-card, .contact-grid { grid-template-columns: 1fr; gap: 3rem; }
+            .timeline::before { left: 16px; }
+            .timeline-item { padding-left: 50px; }
+            .timeline-dot { left: 5px; }
+            .project-card, .contact-form, .skill-group { padding: 1.5rem; }
+            .hero-line-1 { font-size: 2.5rem; }
+            .hero-line-2 { font-size: 1.4rem; }
+            .hero-bottom-left, .hero-bottom-right {
+                position: relative;
+                inset: auto;
+                padding: 1.5rem;
+                max-width: 100%;
+                bottom: auto; right: auto; left: auto;
+            }
+            .hero-heading-wrapper { top: 20%; }
+            .hero-section { height: auto; min-height: 100vh; padding-top: 100px; }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ── ANIMATED BACKGROUND (ADDED ONLY HERE) ── -->
+    <canvas id="bg-canvas"></canvas>
+    <div id="bg-overlay"></div>
+    <!-- ── END BACKGROUND ── -->
+
+    <!-- Loading Preloader Asset -->
+    <div id="loader">
+        <i class="fa-solid fa-cloud loader-cloud"></i>
+        <div class="loader-bar">
+            <div class="loader-progress"></div>
+        </div>
+    </div>
+
+    <!-- Main Clean Navigation Overlay Header Bar -->
+    <nav class="navbar">
+        <a href="#" class="logo-box">
+            <svg class="w-[26px] h-[26px]" style="width:26px; height:26px;" viewBox="0 0 256 256" fill="#ffffff">
+                <path d="M 256 256 L 128 256 L 0 128 L 128 128 Z M 256 128 L 128 128 L 0 0 L 128 0 Z" />
+            </svg>
+            <span class="text-white font-playfair italic"
+                style="color:white; font-size: 1.4rem; margin-left: 0.5rem;">Ak7am Cloud</span>
+        </a>
+
+        <div class="center-pill">
+            <a href="#hero" class="nav-item active-root">Home</a>
+            <a href="#about" class="nav-item">About</a>
+            <a href="#skills" class="nav-item">Skills</a>
+            <a href="#experience" class="nav-item">Experience</a>
+            <a href="#projects" class="nav-item">Projects</a>
+            <a href="#contact" class="nav-item">Contact</a>
+        </div>
+
+        <button class="mobile-hamburger" aria-label="Toggle Menu">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </nav>
+
+    <!-- CLEAN, MODERN SEAMLESS HERO CONTAINER -->
+    <section id="hero" class="hero-section">
+        <div class="hero-heading-wrapper">
+            <img src="C:\Users\mdrak\Downloads\cloudak7am.jpeg" alt="Mohammed Akram R"
+                style="width: 150px; height: 150px; border-radius: 50%; border: 3px solid #ff9900; margin-bottom: 20px; object-fit: cover;">
+            <h1>
+                <span class="hero-line-1">Mohammed Akram R</span>
+                <span class="hero-line-2">Cloud Engineering Portfolio</span>
+            </h1>
+        </div>
+
+        <div class="hero-bottom-left">
+            <p>Specializing in the deployment, performance optimization, and automation of scalable architectures inside
+                public cloud provider footprints.</p>
+        </div>
+
+        <div class="hero-bottom-right">
+            <p>Providing robust infrastructure management, security posture baseline enforcement, and structural
+                observability tools.</p>
+            <button onclick="document.getElementById('about').scrollIntoView({behavior:'smooth'})"
+                class="btn btn-primary">
+                Explore Infrastructure <i class="fa-solid fa-arrow-down" style="margin-left: 5px;"></i>
+            </button>
+        </div>
+    </section>
+
+    <!-- About Profile Section Component Layout -->
+    <section id="about" class="reveal">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">01 // Profile</span>
+                <h2 class="section-title">Operational Excellence In The <span class="highlight">Cloud</span></h2>
+            </div>
+            <div class="about-grid">
+                <div class="about-text">
+                    <p>
+                        I hold a Bachelor of Computer Applications (BCA) degree specializing in cloud methodologies. My
+                        core technical framework targets building secure, observable, and highly operational runtime
+                        footprints designed to survive enterprise scale.
+                    </p>
+                    <p>
+                        I work heavily with virtual network configurations, access identity configurations, container
+                        deployment tools, and custom backend APIs written in Python.
+                    </p>
+                </div>
+                <div class="about-metrics">
+                    <div class="glass-card metric-card">
+                        <span class="metric-num counter" data-target="10">0</span>
+                        <span class="metric-label">AWS Services Practiced</span>
+                    </div>
+                    <div class="glass-card metric-card">
+                        <span class="metric-num counter" data-target="3">0</span>
+                        <span class="metric-label">Cloud Projects Completed</span>
+                    </div>
+                    <div class="glass-card metric-card">
+                        <span class="metric-num counter" data-target="2">0</span>
+                        <span class="metric-label">Internship Programs</span>
+                    </div>
+                    <div class="glass-card metric-card">
+                        <span class="metric-num counter" data-target="30">0</span>
+                        <span class="metric-label">Peers Presented</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Technical Stack Capabilities Section Matrix -->
+    <section id="skills" class="reveal">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">02 // Stack</span>
+                <h2 class="section-title">Technical <span class="highlight">Capabilities</span> Matrix</h2>
+            </div>
+            <div class="skills-grid">
+                <div class="glass-card skill-group">
+                    <h3><i class="fa-solid fa-cloud"></i> Public Cloud Platforms</h3>
+                    <div class="skill-tags">
+                        <span class="skill-tag">AWS Infrastructure</span>
+                        <span class="skill-tag">Google Cloud Engine</span>
+                        <span class="skill-tag">IaaS Architecture</span>
+                        <span class="skill-tag">PaaS Provisioning</span>
+                    </div>
+                </div>
+
+                <div class="glass-card skill-group">
+                    <h3><i class="fa-solid fa-cubes"></i> Essential AWS Services</h3>
+                    <div class="skill-tags">
+                        <span class="skill-tag">Amazon EC2</span>
+                        <span class="skill-tag">Amazon S3</span>
+                        <span class="skill-tag">AWS IAM</span>
+                        <span class="skill-tag">Amazon VPC</span>
+                        <span class="skill-tag">Amazon Route 53</span>
+                        <span class="skill-tag">AWS CloudWatch</span>
+                        <span class="skill-tag">AWS Lambda</span>
+                        <span class="skill-tag">Amazon API Gateway</span>
+                        <span class="skill-tag">Amazon DynamoDB</span>
+                    </div>
+                </div>
+
+                <div class="glass-card skill-group">
+                    <h3><i class="fa-solid fa-network-wired"></i> Core Infrastructure Networking</h3>
+                    <div class="skill-tags">
+                        <span class="skill-tag">TCP/IP Stack</span>
+                        <span class="skill-tag">DNS Zone Management</span>
+                        <span class="skill-tag">CIDR Subnetting</span>
+                        <span class="skill-tag">Security Groups</span>
+                        <span class="skill-tag">Network ACLs</span>
+                        <span class="skill-tag">NAT Gateway Routing</span>
+                        <span class="skill-tag">Internet Gateways</span>
+                    </div>
+                </div>
+
+                <div class="glass-card skill-group">
+                    <h3><i class="fa-solid fa-terminal"></i> Systems & Observability Tools</h3>
+                    <div class="skill-tags">
+                        <span class="skill-tag">Linux (Ubuntu/CentOS)</span>
+                        <span class="skill-tag">Bash Scripting</span>
+                        <span class="skill-tag">Python Automation</span>
+                        <span class="skill-tag">GCP Cloud Monitoring</span>
+                        <span class="skill-tag">Git / GitHub Ecosystem</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Professional Progression Timeline Section -->
+    <section id="experience" class="reveal">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">03 // Experience</span>
+                <h2 class="section-title">Professional <span class="highlight">Development</span> Timeline</h2>
+            </div>
+            <div class="timeline">
+                <div class="glass-card timeline-content">
+                    <div class="timeline-dot"><i class="fa-solid fa-briefcase"></i></div>
+                    <h3 class="timeline-role">Web Development Intern</h3>
+                    <span class="timeline-company">Oasis Infobyte (OIBSIP)</span>
+                    <div class="timeline-meta">
+                        <span><i class="fa-solid fa-calendar-days"></i> 2025 - Present</span>
+                        <span><i class="fa-solid fa-location-dot"></i> Remote</span>
+                    </div>
+                    <ul class="timeline-body">
+                        <li>Built and deployed 'NovaSafe' frontend configurations directly to remote staging builds via
+                            GitHub Pages.</li>
+                        <li>Structured CSS components cleanly inside isolated layouts to guarantee dynamic resolution
+                            scaling.</li>
+                        <li>Maintained clean version control history across main code tree pipelines matching
+                            operational requests.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architectural Project Deployments Showcase -->
+    <section id="projects" class="reveal">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">04 // Deployments</span>
+                <h2 class="section-title">Architected <span class="highlight">Cloud Projects</span></h2>
+            </div>
+            <div class="projects-grid">
+
+                <div class="glass-card project-card">
+                    <div class="project-details">
+                        <h3>Serverless Cloud Infrastructure Portfolio</h3>
+                        <p class="project-desc">
+                            Designed and deployed a fully automated serverless architecture on AWS Free Tier to host a
+                            responsive developer portfolio with real-time visitor engagement tracking and zero server
+                            management overhead.
+                        </p>
+                        <div class="project-tech-list">
+                            <span>AWS Lambda</span>
+                            <span>Amazon API Gateway</span>
+                            <span>Amazon DynamoDB</span>
+                            <span>Amazon S3 Static Hosting</span>
+                            <span>Python Scripting</span>
+                        </div>
+                        <div class="project-actions">
+                            <a href="https://mohammed-akram-claude-portfolio.s3.ap-south-2.amazonaws.com/index_4.html"
+                                target="_blank" class="btn btn-primary btn-sm" style="padding: 0.5rem 1.25rem;"><i
+                                    class="fa-solid fa-globe"></i> Live URL</a>
+                            <a href="https://github.com/ak7am-cr7" target="_blank" class="btn btn-secondary btn-sm"
+                                style="border-radius: 50px;"><i class="fa-brands fa-github"></i> Repository</a>
+                        </div>
+                    </div>
+                    <div class="project-visual">
+                        <div class="topology-row">
+                            <div class="topo-box active">Client Browser</div>
+                        </div>
+                        <div class="topo-arrow-v"></div>
+                        <div class="topology-row">
+                            <div class="topo-box secure">Amazon S3 Assets</div>
+                            <div class="topo-box">API Gateway</div>
+                        </div>
+                        <div class="topo-arrow-v"></div>
+                        <div class="topology-row">
+                            <div class="topo-box">AWS Lambda (Python)</div>
+                        </div>
+                        <div class="topo-arrow-v"></div>
+                        <div class="topology-row">
+                            <div class="topo-box secure">DynamoDB Counter</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card project-card">
+                    <div class="project-details">
+                        <h3>AWS Secure VPC Deployment Lab</h3>
+                        <p class="project-desc">
+                            Architected a production-grade custom AWS VPC from scratch. Designed public and private
+                            subnets across multiple availability zones to enforce isolation and eliminate flat-network
+                            exposure risks.
+                        </p>
+                        <div class="project-tech-list">
+                            <span>Amazon VPC</span>
+                            <span>EC2 Linux Instances</span>
+                            <span>IAM Zero-Trust Rules</span>
+                            <span>AWS CloudWatch</span>
+                            <span>Security Groups</span>
+                        </div>
+                        <div class="project-actions">
+                            <a href="https://github.com/ak7am-cr7" target="_blank" class="btn btn-secondary btn-sm"
+                                style="border-radius: 50px;"><i class="fa-brands fa-github"></i> View Lab Topology
+                                Blueprint</a>
+                        </div>
+                    </div>
+                    <div class="project-visual">
+                        <div class="topology-row">
+                            <div class="topo-box active" style="border-color:#ff9900;">Internet Gateway</div>
+                        </div>
+                        <div class="topo-arrow-v"></div>
+                        <div class="topology-row"
+                            style="border: 1px dashed #0073bb; padding: 10px; border-radius: 4px;">
+                            <div class="topo-box secure">Public Subnet (Bastion Host)</div>
+                            <div class="topo-box">Private Subnet (Isolated App Nodes)</div>
+                        </div>
+                        <div class="topo-arrow-v"></div>
+                        <div class="topology-row">
+                            <div class="topo-box secure">CloudWatch Alert Alarms Dashboard</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Communication Pipeline Contact Endpoint Form Section -->
+    <section id="contact" class="reveal">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">05 // Connection Endpoint</span>
+                <h2 class="section-title">Initiate <span class="highlight">Pipeline Connection</span></h2>
+            </div>
+            <div class="contact-grid">
+                <div class="contact-info">
+                    <p>
+                        Whether you are an IT infrastructure recruiter seeking operational team members, have
+                        troubleshooting technical topics to discuss, or want to review my infrastructure architectural
+                        blueprints, feel free to drop a message.
+                    </p>
+                    <div class="contact-methods">
+                        <div class="contact-method">
+                            <div class="contact-icon"><i class="fa-solid fa-envelope"></i></div>
+                            <div>
+                                <div class="contact-lbl">Primary Email Endpoint</div>
+                                <a href="mailto:mdrakram3@gmail.com" class="contact-val">mdrakram3@gmail.com</a>
+                            </div>
+                        </div>
+                        <div class="contact-method">
+                            <div class="contact-icon"><i class="fa-solid fa-location-dot"></i></div>
+                            <div>
+                                <div class="contact-lbl">Operational Location Base</div>
+                                <div class="contact-val">Chennai, India</div>
+                            </div>
+                        </div>
+                        <div class="contact-method">
+                            <div class="contact-icon"><i class="fa-brands fa-linkedin"></i></div>
+                            <div>
+                                <div class="contact-lbl">Professional Interconnect Node</div>
+                                <a href="https://www.linkedin.com/in/mohammed-ak7am-r-" target="_blank"
+                                    class="contact-val">linkedin.com/in/mohammed-ak7am-r-</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form class="glass-card contact-form" action="https://formspree.io/f/mdavwaje" method="POST">
+                    <div class="form-group">
+                        <label for="name">Identifier / Name</label>
+                        <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Recruiter Name"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Reply-To Routing Address</label>
+                        <input type="email" id="email" name="_replyto" class="form-control"
+                            placeholder="yourname@enterprise.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Transmission Payload</label>
+                        <textarea id="message" name="message" rows="5" class="form-control"
+                            placeholder="Provide infrastructure query context..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="border-radius: 50px;"><i
+                            class="fa-solid fa-paper-plane"></i> Dispatch Payload Signal</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer System Information Layout Component -->
+    <footer class="footer">
+        <div class="container">
+            <p>Built by <strong>Mohammed Akram R</strong> | Cloud &amp; Application Support Engineer &copy; 2026. All
+                Systems Operational.</p>
+        </div>
+    </footer>
+
+    <script>
+        // ── ANIMATED BACKGROUND CANVAS (ONLY NEW CODE ADDED) ──
+        (function () {
+            const canvas = document.getElementById('bg-canvas');
+            const ctx = canvas.getContext('2d');
+            let W, H, nodes = [], animId;
+
+            const COLORS = {
+                orange: 'rgba(255,153,0,',
+                blue: 'rgba(0,115,187,',
+                teal: 'rgba(0,200,160,'
+            };
+
+            function resize() {
+                W = canvas.width = window.innerWidth;
+                H = canvas.height = window.innerHeight;
+            }
+
+            function Node() {
+                this.x = Math.random() * W;
+                this.y = Math.random() * H;
+                this.vx = (Math.random() - 0.5) * 0.35;
+                this.vy = (Math.random() - 0.5) * 0.35;
+                this.r = Math.random() * 2 + 1;
+                const palette = [COLORS.orange, COLORS.blue, COLORS.teal];
+                this.color = palette[Math.floor(Math.random() * palette.length)];
+                this.pulse = Math.random() * Math.PI * 2;
+                this.pulseSpeed = 0.015 + Math.random() * 0.01;
+            }
+
+            Node.prototype.update = function () {
+                this.x += this.vx;
+                this.y += this.vy;
+                this.pulse += this.pulseSpeed;
+                if (this.x < 0 || this.x > W) this.vx *= -1;
+                if (this.y < 0 || this.y > H) this.vy *= -1;
+            };
+
+            Node.prototype.draw = function () {
+                const alpha = 0.5 + 0.4 * Math.sin(this.pulse);
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = this.color + alpha + ')';
+                ctx.fill();
+            };
+
+            function drawEdges() {
+                const MAX_DIST = 180;
+                for (let i = 0; i < nodes.length; i++) {
+                    for (let j = i + 1; j < nodes.length; j++) {
+                        const dx = nodes[i].x - nodes[j].x;
+                        const dy = nodes[i].y - nodes[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < MAX_DIST) {
+                            const alpha = (1 - dist / MAX_DIST) * 0.18;
+                            ctx.beginPath();
+                            ctx.moveTo(nodes[i].x, nodes[i].y);
+                            ctx.lineTo(nodes[j].x, nodes[j].y);
+                            ctx.strokeStyle = nodes[i].color + alpha + ')';
+                            ctx.lineWidth = 0.8;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            let blobT = 0;
+            function drawBlobs() {
+                blobT += 0.003;
+                const blobs = [
+                    { cx: W * 0.15, cy: H * 0.2, r: Math.min(W, H) * 0.28, color: 'rgba(0,115,187,0.055)' },
+                    { cx: W * 0.85, cy: H * 0.8, r: Math.min(W, H) * 0.24, color: 'rgba(255,153,0,0.04)' },
+                    { cx: W * 0.5,  cy: H * 0.5, r: Math.min(W, H) * 0.18, color: 'rgba(0,200,160,0.03)' },
+                ];
+                blobs.forEach((b, i) => {
+                    const ox = Math.sin(blobT + i * 1.3) * 40;
+                    const oy = Math.cos(blobT + i * 0.9) * 30;
+                    const grad = ctx.createRadialGradient(
+                        b.cx + ox, b.cy + oy, 0,
+                        b.cx + ox, b.cy + oy, b.r
+                    );
+                    grad.addColorStop(0, b.color);
+                    grad.addColorStop(1, 'rgba(0,0,0,0)');
+                    ctx.fillStyle = grad;
+                    ctx.beginPath();
+                    ctx.arc(b.cx + ox, b.cy + oy, b.r, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+
+            function loop() {
+                ctx.clearRect(0, 0, W, H);
+                ctx.fillStyle = '#0b0e14';
+                ctx.fillRect(0, 0, W, H);
+                drawBlobs();
+                drawEdges();
+                nodes.forEach(n => { n.update(); n.draw(); });
+                animId = requestAnimationFrame(loop);
+            }
+
+            function init() {
+                resize();
+                nodes = [];
+                const count = Math.floor((W * H) / 14000);
+                for (let i = 0; i < count; i++) nodes.push(new Node());
+                cancelAnimationFrame(animId);
+                loop();
+            }
+
+            window.addEventListener('resize', init);
+            init();
+        })();
+        // ── END BACKGROUND CANVAS ──
+
+        // Preloader Controller Logic
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader');
+            setTimeout(() => {
+                if (loader) {
+                    loader.style.opacity = '0';
+                    loader.style.visibility = 'hidden';
+                }
+                triggerCounters();
+            }, 500);
+        });
+
+        // Content Scroll Intersection Animation Observer
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { threshold: 0.08 });
+        revealElements.forEach(element => revealObserver.observe(element));
+
+        // Telemetry Metrics Counters Method
+        function triggerCounters() {
+            const counters = document.querySelectorAll('.counter');
+            counters.forEach(counter => {
+                counter.innerText = '0';
+                const targetLimit = +counter.getAttribute('data-target');
+                const incrementSpeedValue = Math.ceil(targetLimit / 30);
+                const updateCounterValue = () => {
+                    const currentVal = +counter.innerText;
+                    if (currentVal < targetLimit) {
+                        counter.innerText = `${currentVal + incrementSpeedValue}`;
+                        setTimeout(updateCounterValue, 45);
+                    } else {
+                        counter.innerText = targetLimit + '+';
+                    }
+                };
+                updateCounterValue();
+            });
+        }
+
+        // Active Navigation Highlight Node Mapping
+        const sections = document.querySelectorAll('section');
+        const navItems = document.querySelectorAll('.nav-item');
+        window.addEventListener('scroll', () => {
+            let currentActiveSectionId = "";
+            sections.forEach(section => {
+                if (window.pageYOffset >= section.offsetTop - 150) {
+                    currentActiveSectionId = section.getAttribute('id');
+                }
+            });
+            navItems.forEach(item => {
+                item.classList.remove('active-root', 'active');
+                if (item.getAttribute('href') === `#${currentActiveSectionId}`) {
+                    if (currentActiveSectionId === 'hero') {
+                        item.classList.add('active-root');
+                    } else {
+                        item.classList.add('active');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
