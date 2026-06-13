@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ThermoConvert | Temperature Converter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0f1117;
+      --card: #1a1d27;
+      --bg2: #12141c;
+      --border: rgba(255,255,255,0.07);
+      --text: #f0f2f8;
+      --muted: #6b7280;
+      --blue: #3b82f6;
+      --orange: #f97316;
+      --green: #22c55e;
+      --purple: #a855f7;
+      --red: #ef4444;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: -200px; left: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(59,130,246,0.07) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -200px; right: -200px;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(249,115,22,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 32px;
+      position: relative;
+      z-index: 1;
+    }
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 8px;
+    }
+    .header h1 span { color: var(--blue); }
+    .header p { color: var(--muted); font-size: 0.95rem; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+      position: relative;
+      z-index: 1;
+    }
+
+    .unit-tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 28px;
+      background: var(--bg2);
+      padding: 6px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    .unit-tab {
+      padding: 12px 8px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .unit-tab .tab-icon { font-size: 1.2rem; }
+    .unit-tab .tab-label { font-size: 0.75rem; letter-spacing: 0.5px; }
+
+    .unit-tab.active-celsius {
+      background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(59,130,246,0.1));
+      color: var(--blue);
+      border: 1px solid rgba(59,130,246,0.3);
+    }
+    .unit-tab.active-fahrenheit {
+      background: linear-gradient(135deg, rgba(249,115,22,0.2), rgba(249,115,22,0.1));
+      color: var(--orange);
+      border: 1px solid rgba(249,115,22,0.3);
+    }
+    .unit-tab.active-kelvin {
+      background: linear-gradient(135deg, rgba(168,85,247,0.2), rgba(168,85,247,0.1));
+      color: var(--purple);
+      border: 1px solid rgba(168,85,247,0.3);
+    }
+
+    .input-section { margin-bottom: 24px; }
+
+    .input-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .input-wrapper { position: relative; display: flex; align-items: center; }
+
+    .temp-input {
+      width: 100%;
+      background: var(--bg2);
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 60px 18px 20px;
+      color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.8rem;
+      font-weight: 600;
+      outline: none;
+      transition: border-color 0.2s ease;
+    }
+
+    .temp-input:focus { border-color: var(--blue); }
+    .temp-input.error { border-color: var(--red) !important; animation: shake 0.3s ease; }
+    .temp-input::placeholder { color: var(--muted); font-size: 1.4rem; }
+
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    .unit-badge {
+      position: absolute;
+      right: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.2rem;
+      font-weight: 600;
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+    .unit-badge.celsius { color: var(--blue); }
+    .unit-badge.fahrenheit { color: var(--orange); }
+    .unit-badge.kelvin { color: var(--purple); }
+
+    .error-msg {
+      color: var(--red);
+      font-size: 0.82rem;
+      margin-top: 8px;
+      display: none;
+      align-items: center;
+      gap: 5px;
+    }
+    .error-msg.show { display: flex; }
+
+    .convert-btn {
+      width: 100%;
+      padding: 18px;
+      border-radius: 14px;
+      border: none;
+      background: linear-gradient(135deg, var(--blue), #6366f1);
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .convert-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px rgba(59,130,246,0.35);
+    }
+    .convert-btn:active { transform: translateY(0); }
+    .convert-btn .btn-icon { transition: transform 0.4s ease; }
+    .convert-btn:hover .btn-icon { transform: rotate(180deg); }
+
+    .results-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .result-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .result-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .result-card.celsius-card::before { background: var(--blue); }
+    .result-card.fahrenheit-card::before { background: var(--orange); }
+    .result-card.kelvin-card::before { background: var(--purple); }
+
+    .result-card.active::before { opacity: 1; }
+    .result-card.active { border-color: rgba(255,255,255,0.12); }
+
+    .result-card.full-width { grid-column: 1 / -1; }
+
+    .result-unit {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .result-unit.celsius { color: var(--blue); }
+    .result-unit.fahrenheit { color: var(--orange); }
+    .result-unit.kelvin { color: var(--purple); }
+    .result-unit.same { color: var(--green); }
+
+    .result-value {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .result-value .unit-sym { font-size: 0.95rem; color: var(--muted); margin-left: 2px; }
+    .result-empty { color: var(--muted); }
+
+    .result-value.pop { animation: pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+    @keyframes pop {
+      0% { transform: scale(0.8); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .scale-bar {
+      margin-top: 20px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+
+    .scale-title {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scale-track {
+      position: relative;
+      height: 8px;
+      background: linear-gradient(90deg, #3b82f6 0%, #22c55e 40%, #f97316 70%, #ef4444 100%);
+      border-radius: 100px;
+      margin-bottom: 10px;
+    }
+
+    .scale-needle {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 18px; height: 18px;
+      background: white;
+      border-radius: 50%;
+      border: 3px solid var(--card);
+      box-shadow: 0 0 0 2px white;
+      transition: left 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .scale-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .fun-fact {
+      margin-top: 16px;
+      background: rgba(59,130,246,0.06);
+      border: 1px solid rgba(59,130,246,0.12);
+      border-radius: 10px;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      display: none;
+      align-items: flex-start;
+      gap: 8px;
+      line-height: 1.5;
+    }
+    .fun-fact.show { display: flex; }
+    .fun-fact i { color: var(--blue); margin-top: 2px; flex-shrink: 0; }
+
+    .footer {
+      margin-top: 24px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 24px 20px; }
+      .temp-input { font-size: 1.4rem; }
+      .results-grid { grid-template-columns: 1fr; }
+      .result-card.full-width { grid-column: auto; }
+      .header h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>🌡️ Thermo<span>Convert</span></h1>
+    <p>Fast & accurate temperature conversion with Kelvin support</p>
+  </div>
+
+  <div class="card">
+
+    <!-- Unit Selector Tabs -->
+    <div class="unit-tabs">
+      <button class="unit-tab active-celsius" onclick="selectUnit('celsius')" id="tab-celsius">
+        <span class="tab-icon">🧊</span>
+        <span class="tab-label">°C Celsius</span>
+      </button>
+      <button class="unit-tab" onclick="selectUnit('fahrenheit')" id="tab-fahrenheit">
+        <span class="tab-icon">🔥</span>
+        <span class="tab-label">°F Fahrenheit</span>
+      </button>
+      <button class="unit-tab" onclick="selectUnit('kelvin')" id="tab-kelvin">
+        <span class="tab-icon">⚗️</span>
+        <span class="tab-label">K Kelvin</span>
+      </button>
+    </div>
+
+    <!-- Input -->
+    <div class="input-section">
+      <div class="input-label">
+        <i class="fas fa-thermometer-half"></i>
+        Enter Temperature
+      </div>
+      <div class="input-wrapper">
+        <input
+          type="number"
+          class="temp-input"
+          id="tempInput"
+          placeholder="0"
+          oninput="clearError()"
+          onkeydown="if(event.key==='Enter') convert()"
+        />
+        <span class="unit-badge celsius" id="unitBadge">°C</span>
+      </div>
+      <div class="error-msg" id="errorMsg">
+        <i class="fas fa-exclamation-circle"></i>
+        <span id="errorText">Please enter a valid number!</span>
+      </div>
+    </div>
+
+    <!-- Convert Button -->
+    <button class="convert-btn" onclick="convert()">
+      <i class="fas fa-sync-alt btn-icon"></i>
+      Convert Temperature
+    </button>
+
+    <!-- Results -->
+    <div class="results-label">
+      <i class="fas fa-chart-bar"></i>
+      Converted Results
+    </div>
+
+    <div class="results-grid">
+      <div class="result-card celsius-card" id="result-celsius">
+        <div class="result-unit celsius" id="label-celsius">🧊 Celsius</div>
+        <div class="result-value result-empty" id="val-celsius">—</div>
+      </div>
+      <div class="result-card fahrenheit-card" id="result-fahrenheit">
+        <div class="result-unit fahrenheit" id="label-fahrenheit">🔥 Fahrenheit</div>
+        <div class="result-value result-empty" id="val-fahrenheit">—</div>
+      </div>
+      <div class="result-card kelvin-card full-width" id="result-kelvin">
+        <div class="result-unit kelvin" id="label-kelvin">⚗️ Kelvin</div>
+        <div class="result-value result-empty" id="val-kelvin">—</div>
+      </div>
+    </div>
+
+    <!-- Scale Bar -->
+    <div class="scale-bar">
+      <div class="scale-title">
+        <i class="fas fa-ruler-horizontal"></i>
+        Temperature Scale Indicator
+      </div>
+      <div class="scale-track">
+        <div class="scale-needle" id="scaleNeedle" style="left:50%"></div>
+      </div>
+      <div class="scale-labels">
+        <span>❄️ Freezing</span>
+        <span>Cool</span>
+        <span>Warm</span>
+        <span>🔥 Hot</span>
+      </div>
+    </div>
+
+    <!-- Fun Fact -->
+    <div class="fun-fact" id="funFact">
+      <i class="fas fa-lightbulb"></i>
+      <span id="funFactText"></span>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    Built for OIBSIP Web Development Internship — Task 3 (Temperature Converter)
+  </div>
+
+  <script>
+    let selectedUnit = 'celsius';
+
+    const unitSymbols = { celsius: '°C', fahrenheit: '°F', kelvin: 'K' };
+
+    const defaultLabels = {
+      celsius: '🧊 Celsius',
+      fahrenheit: '🔥 Fahrenheit',
+      kelvin: '⚗️ Kelvin'
+    };
+
+    const funFacts = {
+      celsius: [
+        "-40°C is the magical point where Celsius and Fahrenheit give the exact same reading!",
+        "The Celsius scale was invented by Anders Celsius in 1742.",
+        "Normal human body temperature is about 37°C.",
+        "The coldest natural temperature recorded on Earth was -89.2°C in Antarctica!",
+        "Water freezes at 0°C and boils at 100°C — a beautifully intuitive scale!"
+      ],
+      fahrenheit: [
+        "72°F is considered 'perfect room temperature' by many Americans.",
+        "The Fahrenheit scale was created by Daniel Gabriel Fahrenheit in 1724.",
+        "Human body temperature is approximately 98.6°F.",
+        "The hottest temperature ever recorded on Earth was 134°F in Death Valley, California!",
+        "Water freezes at 32°F and boils at 212°F."
+      ],
+      kelvin: [
+        "0 Kelvin is absolute zero — the coldest possible temperature in the entire universe!",
+        "Deep space is about 2.7 Kelvin — just slightly above absolute zero!",
+        "The Sun's surface temperature is about 5,778 Kelvin.",
+        "Liquid helium boils at just 4.2 Kelvin!",
+        "Kelvin is the SI base unit for temperature and is used in all scientific calculations."
+      ]
+    };
+
+    function selectUnit(unit) {
+      selectedUnit = unit;
+      document.querySelectorAll('.unit-tab').forEach(t => t.className = 'unit-tab');
+      document.getElementById('tab-' + unit).className = 'unit-tab active-' + unit;
+      const badge = document.getElementById('unitBadge');
+      badge.textContent = unitSymbols[unit];
+      badge.className = 'unit-badge ' + unit;
+      document.getElementById('tempInput').value = '';
+      clearResults();
+      clearError();
+    }
+
+    function clearError() {
+      document.getElementById('tempInput').classList.remove('error');
+      document.getElementById('errorMsg').classList.remove('show');
+    }
+
+    function showError(msg) {
+      document.getElementById('tempInput').classList.add('error');
+      document.getElementById('errorText').textContent = msg;
+      document.getElementById('errorMsg').classList.add('show');
+    }
+
+    function clearResults() {
+      ['celsius', 'fahrenheit', 'kelvin'].forEach(u => {
+        const valEl = document.getElementById('val-' + u);
+        valEl.innerHTML = '—';
+        valEl.className = 'result-value result-empty';
+        document.getElementById('result-' + u).classList.remove('active');
+        document.getElementById('label-' + u).className = 'result-unit ' + u;
+        document.getElementById('label-' + u).textContent = defaultLabels[u];
+      });
+      document.getElementById('funFact').classList.remove('show');
+      document.getElementById('scaleNeedle').style.left = '50%';
+    }
+
+    function convert() {
+      const raw = document.getElementById('tempInput').value.trim();
+
+      if (raw === '') { showError('Please enter a temperature value!'); return; }
+
+      const temp = parseFloat(raw);
+
+      if (isNaN(temp)) { showError('Invalid input — please enter a number!'); return; }
+
+      if (selectedUnit === 'kelvin' && temp < 0) {
+        showError('Kelvin cannot be negative! Minimum is 0 K.');
+        return;
+      }
+      if (selectedUnit === 'celsius' && temp < -273.15) {
+        showError('Below absolute zero! Minimum is -273.15°C.');
+        return;
+      }
+      if (selectedUnit === 'fahrenheit' && temp < -459.67) {
+        showError('Below absolute zero! Minimum is -459.67°F.');
+        return;
+      }
+
+      clearError();
+
+      let celsius, fahrenheit, kelvin;
+
+      if (selectedUnit === 'celsius') {
+        celsius = temp;
+        fahrenheit = (temp * 9/5) + 32;
+        kelvin = temp + 273.15;
+      } else if (selectedUnit === 'fahrenheit') {
+        celsius = (temp - 32) * 5/9;
+        fahrenheit = temp;
+        kelvin = (temp - 32) * 5/9 + 273.15;
+      } else {
+        celsius = temp - 273.15;
+        fahrenheit = (temp - 273.15) * 9/5 + 32;
+        kelvin = temp;
+      }
+
+      const results = { celsius, fahrenheit, kelvin };
+      const syms = { celsius: '°C', fahrenheit: '°F', kelvin: 'K' };
+
+      ['celsius', 'fahrenheit', 'kelvin'].forEach(unit => {
+        const valEl = document.getElementById('val-' + unit);
+        const cardEl = document.getElementById('result-' + unit);
+        const labelEl = document.getElementById('label-' + unit);
+        const rounded = Math.round(results[unit] * 10000) / 10000;
+
+        if (unit === selectedUnit) {
+          valEl.innerHTML = `<span style="color:var(--green)">${rounded}</span><span class="unit-sym">${syms[unit]}</span>`;
+          labelEl.className = 'result-unit same';
+          labelEl.textContent = '✅ Input Value';
+        } else {
+          valEl.innerHTML = `${rounded}<span class="unit-sym">${syms[unit]}</span>`;
+          labelEl.className = 'result-unit ' + unit;
+          labelEl.textContent = defaultLabels[unit];
+        }
+
+        valEl.classList.remove('result-empty');
+        valEl.classList.add('pop');
+        cardEl.classList.add('active');
+        setTimeout(() => valEl.classList.remove('pop'), 400);
+      });
+
+      // Scale needle
+      const min = -50, max = 150;
+      let pct = (celsius - min) / (max - min) * 100;
+      pct = Math.max(2, Math.min(98, pct));
+      document.getElementById('scaleNeedle').style.left = pct + '%';
+
+      // Fun fact
+      const facts = funFacts[selectedUnit];
+      document.getElementById('funFactText').textContent = facts[Math.floor(Math.random() * facts.length)];
+      document.getElementById('funFact').classList.add('show');
+    }
+  </script>
+</body>
+</html>
