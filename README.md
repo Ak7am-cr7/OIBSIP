@@ -27,8 +27,8 @@ during my Web Development Internship at
 - Built a personal cloud engineering portfolio
 - Technologies: HTML5, CSS3, JavaScript
 - Features: Animated Background, Glassmorphism, Contact Form
-- 🔗 [Live Demo](https://ak7am-cr7.github.io/OIBSIP/Task2-Portfolio/)
-- 📂 [View Code](./Task2-Portfolio/)
+- 🔗 [Live Demo](https://ak7am-cr7.github.io/OIBSIP/Level%201%20Task2-Portfolio/)
+- 📂 [View Code](./Level%201%20Task2-Portfolio/)
 
 ---
 
